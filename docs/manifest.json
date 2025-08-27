@@ -1,0 +1,10 @@
+{
+"name": "Flowcus",
+"short_name": "Flowcus",
+"start_url": "/Flowcus/",
+"scope": "/Flowcus/",
+"display": "standalone",
+"background_color": "#ffffff",
+"theme_color": "#2563eb",
+"icons": []
+}
