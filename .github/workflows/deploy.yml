@@ -1,0 +1,75 @@
+name: Deploy to GitHub Pages
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - run: npm ci || npm install
+      - name: Build web (no public-url)
+        run: npx expo export --platform web --output-dir dist
+      - name: Prepare for GH Pages (nojekyll + SPA fallback)
+        run: |
+          touch dist/.nojekyll
+          cp dist/index.html dist/404.html
+      - name: Inject base href for subpath
+        run: |
+          sed -i 's|<head>|<head><base href="/Flowcus/">|' dist/index.html dist/404.html
+      - name: Fix absolute asset paths to subpath
+        run: |
+          sed -i 's|src="/_expo/|src="/Flowcus/_expo/|g' dist/index.html dist/404.html
+          sed -i 's|href="/_expo/|href="/Flowcus/_expo/|g' dist/index.html dist/404.html
+      - name: Inject manifest link and iOS metas
+        run: |
+          for f in dist/index.html dist/404.html; do \
+            grep -q 'rel="manifest"' "$f" || sed -i '/<head[^>]*>/a \  <link rel="manifest" href="/Flowcus/manifest.json">' "$f"; \
+            grep -q 'apple-mobile-web-app-capable' "$f" || sed -i '/<head[^>]*>/a \  <meta name="apple-mobile-web-app-capable" content="yes">' "$f"; \
+            grep -q 'apple-mobile-web-app-title' "$f" || sed -i '/<head[^>]*>/a \  <meta name="apple-mobile-web-app-title" content="Flowcus">' "$f"; \
+            grep -q 'apple-mobile-web-app-status-bar-style' "$f" || sed -i '/<head[^>]*>/a \  <meta name="apple-mobile-web-app-status-bar-style" content="default">' "$f"; \
+            grep -q 'mobile-web-app-capable' "$f" || sed -i '/<head[^>]*>/a \  <meta name="mobile-web-app-capable" content="yes">' "$f"; \
+          done
+      - name: Write manifest.json
+        run: |
+          cat > dist/manifest.json << 'JSON'
+          {
+            "name": "Flowcus",
+            "short_name": "Flowcus",
+            "start_url": "/Flowcus/",
+            "scope": "/Flowcus/",
+            "display": "standalone",
+            "background_color": "#ffffff",
+            "theme_color": "#2563eb",
+            "icons": []
+          }
+          JSON
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
