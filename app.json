@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "Flowcus",
+    "slug": "flowcus",
+    "version": "0.1.0",
+    "scheme": "flowcus",
+    "orientation": "portrait",
+    "platforms": ["ios", "android", "web"],
+    "assetBundlePatterns": ["**/*"],
+    "ios": { "supportsTablet": true },
+    "android": { "adaptiveIcon": { "foregroundImage": "./assets/adaptive-icon.png", "backgroundColor": "#ffffff" } },
+    "web": {
+      "bundler": "metro",
+      "name": "Flowcus",
+      "shortName": "Flowcus",
+      "backgroundColor": "#ffffff",
+      "themeColor": "#2563eb",
+      "display": "standalone"
+    }
+  }
+}
