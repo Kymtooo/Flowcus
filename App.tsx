@@ -8,6 +8,7 @@ import LifeLogScreen from './src/screens/LifeLogScreen';
 import { TasksProvider } from './src/context/TasksContext';
 import { I18nProvider, useI18n } from './src/i18n';
 import { ThemeProvider, useThemeTokens } from './src/ThemeContext';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import SettingsScreen from './src/screens/SettingsScreen';
 
 const Tab = createBottomTabNavigator();
@@ -15,9 +16,24 @@ const Tab = createBottomTabNavigator();
 function Tabs() {
   const { t } = useI18n();
   const { theme } = useThemeTokens();
+  const insets = useSafeAreaInsets();
+  const bottomPad = Math.max(insets.bottom, 10);
+  const tabHeight = 56 + bottomPad;
   return (
     <NavigationContainer>
-      <Tab.Navigator screenOptions={{ headerShown: false, tabBarStyle: { backgroundColor: theme.card }, tabBarActiveTintColor: theme.primary }}>
+      <Tab.Navigator
+        screenOptions={{
+          headerShown: false,
+          tabBarStyle: {
+            backgroundColor: theme.card,
+            paddingBottom: bottomPad,
+            height: tabHeight,
+            borderTopColor: theme.border,
+            borderTopWidth: 1,
+          },
+          tabBarActiveTintColor: theme.primary,
+        }}
+      >
         <Tab.Screen name="Today" component={TodayScreen} options={{ title: t('Today') }} />
         <Tab.Screen name="Routines" component={TasksScreen} options={{ title: t('Routines') }} />
         <Tab.Screen name="Log" component={LogScreen} options={{ title: t('Log') }} />
