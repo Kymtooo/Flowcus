@@ -1,10 +1,11 @@
 name: Deploy to GitHub Pages
 on:
-push:
-workflow_dispatch:
-
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 jobs:
-deploy:
+  deploy:
     runs-on: ubuntu-latest
     permissions:
       contents: write
