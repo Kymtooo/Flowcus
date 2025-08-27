@@ -8,6 +8,7 @@ import LifeLogScreen from './src/screens/LifeLogScreen';
 import { TasksProvider } from './src/context/TasksContext';
 import { I18nProvider, useI18n } from './src/i18n';
 import { ThemeProvider, useThemeTokens } from './src/ThemeContext';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import SettingsScreen from './src/screens/SettingsScreen';
 
@@ -49,7 +50,9 @@ export default function App() {
     <I18nProvider>
       <ThemeProvider>
         <TasksProvider>
-          <Tabs />
+          <SafeAreaProvider>
+            <Tabs />
+          </SafeAreaProvider>
         </TasksProvider>
       </ThemeProvider>
     </I18nProvider>
